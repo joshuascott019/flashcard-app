@@ -10,11 +10,13 @@ function App() {
   const [currentCategory, setCurrentCategory] = useState('default');
   const [sortMode, setSortMode] = useState('byCreation');
 
+  // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('flashcardData');
     if (stored) setCategories(JSON.parse(stored));
   }, []);
 
+  // Auto-save on change
   useEffect(() => {
     localStorage.setItem('flashcardData', JSON.stringify(categories));
   }, [categories]);
@@ -35,6 +37,24 @@ function App() {
     });
   };
 
+  const deleteCard = (idx) => {
+    setCategories((prev) => {
+      const list = prev[currentCategory] || [];
+      const newList = list.filter((_, i) => i !== idx);
+      return { ...prev, [currentCategory]: newList };
+    });
+  };
+
+  const deleteCategory = (name) => {
+    setCategories((prev) => {
+      const { [name]: _, ...rest } = prev;
+      return rest;
+    });
+    // choose a new current category
+    const remaining = Object.keys(categories).filter((cat) => cat !== name);
+    setCurrentCategory(remaining[0] || '');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-4">Flashcard App</h1>
@@ -44,13 +64,19 @@ function App() {
           current={currentCategory}
           onChange={setCurrentCategory}
           onAdd={(name) => setCategories((prev) => ({ ...prev, [name]: [] }))}
+          onDelete={deleteCategory}
         />
         <SortOptions mode={sortMode} onChange={setSortMode} />
         <AddCardForm onAdd={addCard} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedCards.map((card, idx) => (
-          <Flashcard key={idx} front={card.front} back={card.back} />
+          <Flashcard
+            key={idx}
+            front={card.front}
+            back={card.back}
+            onDelete={() => deleteCard(idx)}
+          />
         ))}
       </div>
       <div className="mt-8">

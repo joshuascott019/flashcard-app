@@ -1,13 +1,23 @@
 import { useState } from 'react';
 
-export default function Flashcard({ front, back }) {
+export default function Flashcard({ front, back, onDelete }) {
   const [flipped, setFlipped] = useState(false);
   return (
     <div
-      onClick={() => setFlipped(!flipped)}
-      className="w-full h-48 cursor-pointer"
+      className="relative w-full h-48 cursor-pointer"
       style={{ perspective: '1000px' }}
+      onClick={() => setFlipped(!flipped)}
     >
+      {/* Delete button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        className="absolute top-2 right-2 z-10 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+      >
+        ×
+      </button>
       <div
         className="relative w-full h-full transition-transform duration-500"
         style={{
