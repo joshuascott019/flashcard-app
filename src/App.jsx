@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import Flashcard from './assets/components/Flashcard.jsx';
-import CategorySelector from './assets/components/CategorySelector.jsx';
-import SortOptions from './assets/components/SortOptions.jsx';
-import JsonIO from './assets/components/JsonIO.jsx';
+import Flashcard from './components/Flashcard';
+import AddCardForm from './components/AddCardForm';
+import CategorySelector from './components/CategorySelector';
+import SortOptions from './components/SortOptions';
+import JsonIO from './components/JsonIO';
 
 function App() {
-  const [categories, setCategories] = useState({});
+  const [categories, setCategories] = useState({ default: [] });
   const [currentCategory, setCurrentCategory] = useState('default');
   const [sortMode, setSortMode] = useState('byCreation');
 
@@ -22,19 +23,24 @@ function App() {
 
   const cards = categories[currentCategory] || [];
   const sortedCards =
-    sortMode === 'random' ? [...cards].sort(() => Math.random() - 0.5) : cards;
+    sortMode === 'random'
+      ? [...cards].sort(() => Math.random() - 0.5)
+      : [...cards].sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
 
   const addCard = (front, back) => {
+    const newCard = { front, back, createdAt: new Date().toISOString() };
     setCategories((prev) => {
       const list = prev[currentCategory] || [];
-      return { ...prev, [currentCategory]: [...list, { front, back }] };
+      return { ...prev, [currentCategory]: [...list, newCard] };
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-4">Flashcard App</h1>
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         <CategorySelector
           categories={Object.keys(categories)}
           current={currentCategory}
@@ -42,13 +48,14 @@ function App() {
           onAdd={(name) => setCategories((prev) => ({ ...prev, [name]: [] }))}
         />
         <SortOptions mode={sortMode} onChange={setSortMode} />
+        <AddCardForm onAdd={addCard} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedCards.map((card, idx) => (
           <Flashcard key={idx} front={card.front} back={card.back} />
         ))}
       </div>
-      <div className="mt-6">
+      <div className="mt-8">
         <JsonIO data={categories} onLoad={setCategories} />
       </div>
     </div>

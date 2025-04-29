@@ -27,9 +27,10 @@ export default function CategorySelector({
         onChange={(e) => setNewName(e.target.value)}
       />
       <button
-        className="bg-blue-500 text-white rounded px-4 py-2"
+        type="button"
+        className="bg-green-500 text-white rounded px-4 py-2"
         onClick={() => {
-          onAdd(newName);
+          onAdd(newName.trim());
           setNewName('');
         }}
       >
