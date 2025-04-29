@@ -10,13 +10,11 @@ function App() {
   const [currentCategory, setCurrentCategory] = useState('default');
   const [sortMode, setSortMode] = useState('byCreation');
 
-  // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('flashcardData');
     if (stored) setCategories(JSON.parse(stored));
   }, []);
 
-  // Auto-save on change
   useEffect(() => {
     localStorage.setItem('flashcardData', JSON.stringify(categories));
   }, [categories]);

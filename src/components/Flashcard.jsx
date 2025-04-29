@@ -5,21 +5,28 @@ export default function Flashcard({ front, back }) {
   return (
     <div
       onClick={() => setFlipped(!flipped)}
-      className="relative w-full h-48 p-4 cursor-pointer perspective-1000"
+      className="w-full h-48 cursor-pointer"
+      style={{ perspective: '1000px' }}
     >
       <div
-        className={`absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4 transition-transform duration-500 transform-style-preserve-backface ${
-          flipped ? 'rotate-y-180' : ''
-        }`}
+        className="relative w-full h-full transition-transform duration-500"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        }}
       >
-        {front}
-      </div>
-      <div
-        className={`absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4 transition-transform duration-500 transform-style-preserve-backface rotate-y-180 ${
-          flipped ? 'rotate-y-0' : 'hidden'
-        }`}
-      >
-        {back}
+        <div
+          className="absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4"
+          style={{ backfaceVisibility: 'hidden' }}
+        >
+          {front}
+        </div>
+        <div
+          className="absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4"
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+        >
+          {back}
+        </div>
       </div>
     </div>
   );
