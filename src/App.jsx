@@ -6,14 +6,19 @@ import SortOptions from './components/SortOptions';
 import JsonIO from './components/JsonIO';
 
 function App() {
-  const [categories, setCategories] = useState({ default: [] });
-  const [currentCategory, setCurrentCategory] = useState('default');
+  const [categories, setCategories] = useState({});
+  const [currentCategory, setCurrentCategory] = useState('');
   const [sortMode, setSortMode] = useState('byCreation');
 
   // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('flashcardData');
-    if (stored) setCategories(JSON.parse(stored));
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setCategories(parsed);
+      const first = Object.keys(parsed)[0] || '';
+      setCurrentCategory(first);
+    }
   }, []);
 
   // Auto-save on change
@@ -21,7 +26,7 @@ function App() {
     localStorage.setItem('flashcardData', JSON.stringify(categories));
   }, [categories]);
 
-  const cards = categories[currentCategory] || [];
+  const cards = currentCategory ? categories[currentCategory] || [] : [];
   const sortedCards =
     sortMode === 'random'
       ? [...cards].sort(() => Math.random() - 0.5)
@@ -30,11 +35,12 @@ function App() {
         );
 
   const addCard = (front, back) => {
+    if (!currentCategory) return;
     const newCard = { front, back, createdAt: new Date().toISOString() };
-    setCategories((prev) => {
-      const list = prev[currentCategory] || [];
-      return { ...prev, [currentCategory]: [...list, newCard] };
-    });
+    setCategories((prev) => ({
+      ...prev,
+      [currentCategory]: [...(prev[currentCategory] || []), newCard],
+    }));
   };
 
   const deleteCard = (idx) => {
@@ -45,12 +51,17 @@ function App() {
     });
   };
 
+  const addCategory = (name) => {
+    if (!name) return;
+    setCategories((prev) => ({ ...prev, [name]: [] }));
+    setCurrentCategory(name);
+  };
+
   const deleteCategory = (name) => {
     setCategories((prev) => {
       const { [name]: _, ...rest } = prev;
       return rest;
     });
-    // choose a new current category
     const remaining = Object.keys(categories).filter((cat) => cat !== name);
     setCurrentCategory(remaining[0] || '');
   };
@@ -63,22 +74,24 @@ function App() {
           categories={Object.keys(categories)}
           current={currentCategory}
           onChange={setCurrentCategory}
-          onAdd={(name) => setCategories((prev) => ({ ...prev, [name]: [] }))}
+          onAdd={addCategory}
           onDelete={deleteCategory}
         />
         <SortOptions mode={sortMode} onChange={setSortMode} />
         <AddCardForm onAdd={addCard} />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedCards.map((card, idx) => (
-          <Flashcard
-            key={idx}
-            front={card.front}
-            back={card.back}
-            onDelete={() => deleteCard(idx)}
-          />
-        ))}
-      </div>
+      {currentCategory && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedCards.map((card, idx) => (
+            <Flashcard
+              key={idx}
+              front={card.front}
+              back={card.back}
+              onDelete={() => deleteCard(idx)}
+            />
+          ))}
+        </div>
+      )}
       <div className="mt-8">
         <JsonIO data={categories} onLoad={setCategories} />
       </div>

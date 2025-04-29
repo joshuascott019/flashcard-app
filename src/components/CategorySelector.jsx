@@ -8,26 +8,32 @@ export default function CategorySelector({
   onDelete,
 }) {
   const [newName, setNewName] = useState('');
+  const hasCategories = categories.length > 0;
+
   return (
     <div className="flex items-center gap-2">
-      <select
-        className="border rounded p-2"
-        value={current}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {categories.map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
-      <button
-        type="button"
-        className="bg-red-500 text-white rounded px-3 py-2"
-        onClick={() => onDelete(current)}
-      >
-        Delete
-      </button>
+      {hasCategories && (
+        <>
+          <select
+            className="border rounded p-2"
+            value={current}
+            onChange={(e) => onChange(e.target.value)}
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="bg-red-500 text-white rounded px-3 py-2"
+            onClick={() => onDelete(current)}
+          >
+            Delete
+          </button>
+        </>
+      )}
       <input
         className="border rounded p-2"
         placeholder="New category"
