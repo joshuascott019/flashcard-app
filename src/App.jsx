@@ -1,3 +1,4 @@
+// ===== App.jsx =====
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
@@ -41,13 +42,16 @@ export default function App() {
     setShowModal(false);
   };
 
-  const saveToFile = () => {
+  const saveToFile = (filename) => {
     const data = JSON.stringify(cards, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'flashcards.json';
+    const nameWithExt = filename.endsWith('.json')
+      ? filename
+      : filename + '.json';
+    a.download = nameWithExt;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -61,12 +65,20 @@ export default function App() {
         const imported = JSON.parse(evt.target.result);
         setCards(imported);
         setCurrentIndex(0);
+        setShowSettings(false);
       } catch {
         alert('Invalid JSON file');
       }
     };
     reader.readAsText(file);
     e.target.value = null;
+  };
+
+  const handleSave = () => {
+    const defaultName = 'FlashcardApp - ';
+    const fname = window.prompt('Enter filename', defaultName) || defaultName;
+    saveToFile(fname);
+    setShowSettings(false);
   };
 
   const goPrev = () => setCurrentIndex((i) => (i > 0 ? i - 1 : i));
@@ -190,7 +202,7 @@ export default function App() {
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
-          onSave={saveToFile}
+          onSave={handleSave}
           onLoad={loadFromFile}
         />
       )}
