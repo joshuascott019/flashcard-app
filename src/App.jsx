@@ -193,7 +193,7 @@ export default function App() {
               />
               {questionFocused && (
                 <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
-                  {newQuestion.length}/30
+                  {newQuestion.length}/120
                 </div>
               )}
             </div>
