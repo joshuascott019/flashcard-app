@@ -15,18 +15,13 @@ export default function App() {
   // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setCards(parsed);
-    }
+    if (stored) setCards(JSON.parse(stored));
   }, []);
 
-  // Save to localStorage on card change
+  // Save to localStorage on change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-    if (currentIndex >= cards.length) {
-      setCurrentIndex(cards.length - 1);
-    }
+    if (currentIndex >= cards.length) setCurrentIndex(cards.length - 1);
   }, [cards]);
 
   const addCard = () => {
