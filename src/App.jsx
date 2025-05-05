@@ -5,6 +5,7 @@ const STORAGE_KEY = 'flashcards';
 
 export default function App() {
   const [cards, setCards] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
   const [newAnswer, setNewAnswer] = useState('');
@@ -13,13 +14,17 @@ export default function App() {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      setCards(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      setCards(parsed);
     }
   }, []);
 
   // Save to localStorage on card change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    if (currentIndex >= cards.length) {
+      setCurrentIndex(cards.length - 1);
+    }
   }, [cards]);
 
   const addCard = () => {
@@ -29,7 +34,9 @@ export default function App() {
       question: newQuestion,
       answer: newAnswer,
     };
-    setCards([...cards, newCard]);
+    const oldLen = cards.length;
+    setCards((prev) => [...prev, newCard]);
+    setCurrentIndex(oldLen); // show newly added card
     setNewQuestion('');
     setNewAnswer('');
     setShowModal(false);
@@ -39,7 +46,6 @@ export default function App() {
     const data = JSON.stringify(cards, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = 'flashcards.json';
@@ -47,33 +53,65 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6 gap-6">
-      <div className="flex flex-wrap justify-center gap-4">
-        {cards.map((card) => (
-          <Flashcard
-            key={card.id}
-            question={card.question}
-            answer={card.answer}
-          />
-        ))}
+  const goPrev = () => setCurrentIndex((i) => (i > 0 ? i - 1 : i));
+  const goNext = () =>
+    setCurrentIndex((i) => (i < cards.length - 1 ? i + 1 : i));
 
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
+      {/* Title */}
+      <h1 className="text-3xl font-bold text-center">Flashcard App</h1>
+
+      {/* Card Display with Pagination or Placeholder */}
+      {cards.length > 0 ? (
+        <>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={goPrev}
+              disabled={currentIndex === 0}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              &larr;
+            </button>
+
+            <Flashcard
+              question={cards[currentIndex]?.question}
+              answer={cards[currentIndex]?.answer}
+            />
+
+            <button
+              onClick={goNext}
+              disabled={currentIndex === cards.length - 1}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              &rarr;
+            </button>
+          </div>
+          <div className="text-lg">{`${currentIndex + 1}/${cards.length}`}</div>
+        </>
+      ) : (
+        <div className="text-gray-500">
+          No flashcards yet. Click "Add Card" to create one.
+        </div>
+      )}
+
+      <div className="flex gap-4">
         {/* Add New Card */}
         <button
           onClick={() => setShowModal(true)}
-          className="w-48 h-64 bg-white border-2 border-dashed border-gray-400 rounded-xl flex items-center justify-center text-4xl font-bold text-gray-500 hover:bg-gray-200 transition"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          +
+          Add Card
+        </button>
+
+        {/* Export Button */}
+        <button
+          onClick={saveToFile}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Save to File
         </button>
       </div>
-
-      {/* Export Button */}
-      <button
-        onClick={saveToFile}
-        className="mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-      >
-        Save to File
-      </button>
 
       {/* Modal */}
       {showModal && (
