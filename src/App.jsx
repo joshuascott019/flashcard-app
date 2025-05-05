@@ -1,3 +1,4 @@
+// ===== App.jsx =====
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
@@ -87,6 +88,16 @@ export default function App() {
     const fname = window.prompt('Enter filename', defaultName) || defaultName;
     saveToFile(fname);
     setShowSettings(false);
+  };
+
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear all flashcards?')) {
+      setCards([]);
+      localStorage.removeItem(STORAGE_KEY);
+      setCurrentIndex(0);
+      setFlipKey((prev) => prev + 1);
+      setShowSettings(false); // ✅ This is what closes the modal
+    }
   };
 
   const goPrev = () => {
@@ -225,6 +236,7 @@ export default function App() {
           onClose={() => setShowSettings(false)}
           onSave={handleSave}
           onLoad={loadFromFile}
+          onClear={handleClear}
         />
       )}
     </div>
