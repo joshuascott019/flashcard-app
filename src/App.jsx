@@ -184,7 +184,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Question"
-                maxLength={30}
+                maxLength={120}
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
                 onFocus={() => setQuestionFocused(true)}
