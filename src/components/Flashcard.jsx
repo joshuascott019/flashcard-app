@@ -14,12 +14,12 @@ export default function Flashcard({ question, answer }) {
         }`}
       >
         {/* Front */}
-        <div className="absolute w-full h-full backface-hidden flex items-center justify-center p-4 text-center text-lg font-medium bg-white rounded-xl border break-words">
+        <div className="absolute w-full h-full backface-hidden flex items-center justify-center p-4 text-center text-lg font-medium bg-white rounded-xl border break-all">
           {question}
         </div>
 
         {/* Back */}
-        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-4 text-center text-lg font-medium bg-gray-100 rounded-xl border break-words">
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-4 text-center text-lg font-medium bg-gray-100 rounded-xl border break-all">
           {answer}
         </div>
       </div>
