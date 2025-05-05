@@ -14,6 +14,7 @@ export default function App() {
   const [questionFocused, setQuestionFocused] = useState(false);
   const [answerFocused, setAnswerFocused] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [flipKey, setFlipKey] = useState(0); // Used to reset flip
 
   // Load from localStorage
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function App() {
     setNewQuestion('');
     setNewAnswer('');
     setShowModal(false);
+    setFlipKey((prev) => prev + 1); // Reset flip
   };
 
   const saveToFile = (filename) => {
@@ -66,6 +68,7 @@ export default function App() {
         setCards(imported);
         setCurrentIndex(0);
         setShowSettings(false);
+        setFlipKey((prev) => prev + 1); // Reset flip
       } catch {
         alert('Invalid JSON file');
       }
@@ -81,9 +84,21 @@ export default function App() {
     setShowSettings(false);
   };
 
-  const goPrev = () => setCurrentIndex((i) => (i > 0 ? i - 1 : i));
-  const goNext = () =>
-    setCurrentIndex((i) => (i < cards.length - 1 ? i + 1 : i));
+  const goPrev = () => {
+    setCurrentIndex((i) => {
+      const newIndex = i > 0 ? i - 1 : i;
+      setFlipKey((prev) => prev + 1);
+      return newIndex;
+    });
+  };
+
+  const goNext = () => {
+    setCurrentIndex((i) => {
+      const newIndex = i < cards.length - 1 ? i + 1 : i;
+      setFlipKey((prev) => prev + 1);
+      return newIndex;
+    });
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
@@ -110,6 +125,7 @@ export default function App() {
               &larr;
             </button>
             <Flashcard
+              key={flipKey}
               question={cards[currentIndex].question}
               answer={cards[currentIndex].answer}
             />
