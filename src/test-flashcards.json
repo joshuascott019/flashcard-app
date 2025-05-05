@@ -1,0 +1,22 @@
+[
+  {
+    "id": 101,
+    "question": "What is the capital of Japan?",
+    "answer": "Tokyo"
+  },
+  {
+    "id": 102,
+    "question": "Who wrote '1984'?",
+    "answer": "George Orwell"
+  },
+  {
+    "id": 103,
+    "question": "What is the chemical symbol for Gold?",
+    "answer": "Au"
+  },
+  {
+    "id": 104,
+    "question": "What's the square root of 144?",
+    "answer": "12"
+  }
+]

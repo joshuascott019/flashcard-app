@@ -1,102 +1,116 @@
 import { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
-import AddCardForm from './components/AddCardForm';
-import CategorySelector from './components/CategorySelector';
-import SortOptions from './components/SortOptions';
-import JsonIO from './components/JsonIO';
 
-function App() {
-  const [categories, setCategories] = useState({});
-  const [currentCategory, setCurrentCategory] = useState('');
-  const [sortMode, setSortMode] = useState('byCreation');
+const STORAGE_KEY = 'flashcards';
+
+export default function App() {
+  const [cards, setCards] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newAnswer, setNewAnswer] = useState('');
 
   // Load from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('flashcardData');
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      setCategories(parsed);
-      const first = Object.keys(parsed)[0] || '';
-      setCurrentCategory(first);
+      setCards(JSON.parse(stored));
     }
   }, []);
 
-  // Auto-save on change
+  // Save to localStorage on card change
   useEffect(() => {
-    localStorage.setItem('flashcardData', JSON.stringify(categories));
-  }, [categories]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  }, [cards]);
 
-  const cards = currentCategory ? categories[currentCategory] || [] : [];
-  const sortedCards =
-    sortMode === 'random'
-      ? [...cards].sort(() => Math.random() - 0.5)
-      : [...cards].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-        );
-
-  const addCard = (front, back) => {
-    if (!currentCategory) return;
-    const newCard = { front, back, createdAt: new Date().toISOString() };
-    setCategories((prev) => ({
-      ...prev,
-      [currentCategory]: [...(prev[currentCategory] || []), newCard],
-    }));
+  const addCard = () => {
+    if (!newQuestion.trim() || !newAnswer.trim()) return;
+    const newCard = {
+      id: Date.now(),
+      question: newQuestion,
+      answer: newAnswer,
+    };
+    setCards([...cards, newCard]);
+    setNewQuestion('');
+    setNewAnswer('');
+    setShowModal(false);
   };
 
-  const deleteCard = (idx) => {
-    setCategories((prev) => {
-      const list = prev[currentCategory] || [];
-      const newList = list.filter((_, i) => i !== idx);
-      return { ...prev, [currentCategory]: newList };
-    });
-  };
+  const saveToFile = () => {
+    const data = JSON.stringify(cards, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
 
-  const addCategory = (name) => {
-    if (!name) return;
-    setCategories((prev) => ({ ...prev, [name]: [] }));
-    setCurrentCategory(name);
-  };
-
-  const deleteCategory = (name) => {
-    setCategories((prev) => {
-      const { [name]: _, ...rest } = prev;
-      return rest;
-    });
-    const remaining = Object.keys(categories).filter((cat) => cat !== name);
-    setCurrentCategory(remaining[0] || '');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flashcards.json';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-4">Flashcard App</h1>
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <CategorySelector
-          categories={Object.keys(categories)}
-          current={currentCategory}
-          onChange={setCurrentCategory}
-          onAdd={addCategory}
-          onDelete={deleteCategory}
-        />
-        <SortOptions mode={sortMode} onChange={setSortMode} />
-        <AddCardForm onAdd={addCard} />
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6 gap-6">
+      <div className="flex flex-wrap justify-center gap-4">
+        {cards.map((card) => (
+          <Flashcard
+            key={card.id}
+            question={card.question}
+            answer={card.answer}
+          />
+        ))}
+
+        {/* Add New Card */}
+        <button
+          onClick={() => setShowModal(true)}
+          className="w-48 h-64 bg-white border-2 border-dashed border-gray-400 rounded-xl flex items-center justify-center text-4xl font-bold text-gray-500 hover:bg-gray-200 transition"
+        >
+          +
+        </button>
       </div>
-      {currentCategory && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedCards.map((card, idx) => (
-            <Flashcard
-              key={idx}
-              front={card.front}
-              back={card.back}
-              onDelete={() => deleteCard(idx)}
+
+      {/* Export Button */}
+      <button
+        onClick={saveToFile}
+        className="mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+      >
+        Save to File
+      </button>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Add New Flashcard</h2>
+            <input
+              type="text"
+              placeholder="Question"
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              className="w-full border p-2 mb-3 rounded"
             />
-          ))}
+            <input
+              type="text"
+              placeholder="Answer"
+              value={newAnswer}
+              onChange={(e) => setNewAnswer(e.target.value)}
+              className="w-full border p-2 mb-4 rounded"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={addCard}
+                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Add
+              </button>
+            </div>
+          </div>
         </div>
       )}
-      <div className="mt-8">
-        <JsonIO data={categories} onLoad={setCategories} />
-      </div>
     </div>
   );
 }
-
-export default App;

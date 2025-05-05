@@ -1,41 +1,26 @@
 import { useState } from 'react';
 
-export default function Flashcard({ front, back, onDelete }) {
+export default function Flashcard({ question, answer }) {
   const [flipped, setFlipped] = useState(false);
+
   return (
     <div
-      className="relative w-full h-48 cursor-pointer"
-      style={{ perspective: '1000px' }}
       onClick={() => setFlipped(!flipped)}
+      className="w-48 h-64 bg-white rounded-xl shadow-md cursor-pointer perspective"
     >
-      {/* Delete button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        className="absolute top-2 right-2 z-10 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-      >
-        ×
-      </button>
       <div
-        className="relative w-full h-full transition-transform duration-500"
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        }}
+        className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d ${
+          flipped ? 'rotate-y-180' : ''
+        }`}
       >
-        <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4"
-          style={{ backfaceVisibility: 'hidden' }}
-        >
-          {front}
+        {/* Front */}
+        <div className="absolute w-full h-full backface-hidden flex items-center justify-center p-4 text-center text-lg font-medium bg-white rounded-xl border">
+          {question}
         </div>
-        <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xl p-4"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-        >
-          {back}
+
+        {/* Back */}
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-4 text-center text-lg font-medium bg-gray-100 rounded-xl border">
+          {answer}
         </div>
       </div>
     </div>
