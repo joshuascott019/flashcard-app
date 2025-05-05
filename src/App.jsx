@@ -1,4 +1,3 @@
-// ===== App.jsx =====
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
@@ -15,18 +14,22 @@ export default function App() {
   const [answerFocused, setAnswerFocused] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [flipKey, setFlipKey] = useState(0); // Used to reset flip
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) setCards(JSON.parse(stored));
+    setHasLoaded(true);
   }, []);
 
   // Save to localStorage on change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-    if (currentIndex >= cards.length) setCurrentIndex(cards.length - 1);
-  }, [cards]);
+    if (hasLoaded) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+      if (currentIndex >= cards.length) setCurrentIndex(cards.length - 1);
+    }
+  }, [cards, hasLoaded]);
 
   const addCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
@@ -36,7 +39,8 @@ export default function App() {
       answer: newAnswer,
     };
     const oldLen = cards.length;
-    setCards((prev) => [...prev, newCard]);
+    const updatedCards = [...cards, newCard];
+    setCards(updatedCards);
     setCurrentIndex(oldLen);
     setNewQuestion('');
     setNewAnswer('');
@@ -66,6 +70,7 @@ export default function App() {
       try {
         const imported = JSON.parse(evt.target.result);
         setCards(imported);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
         setCurrentIndex(0);
         setShowSettings(false);
         setFlipKey((prev) => prev + 1); // Reset flip
