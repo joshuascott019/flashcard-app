@@ -202,7 +202,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Answer"
-                maxLength={30}
+                maxLength={120}
                 value={newAnswer}
                 onChange={(e) => setNewAnswer(e.target.value)}
                 onFocus={() => setAnswerFocused(true)}
@@ -211,7 +211,7 @@ export default function App() {
               />
               {answerFocused && (
                 <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
-                  {newAnswer.length}/30
+                  {newAnswer.length}/120
                 </div>
               )}
             </div>
