@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
+import SettingsModal from './components/SettingsModal';
 
 const STORAGE_KEY = 'flashcards';
 
@@ -11,6 +12,7 @@ export default function App() {
   const [newAnswer, setNewAnswer] = useState('');
   const [questionFocused, setQuestionFocused] = useState(false);
   const [answerFocused, setAnswerFocused] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -50,12 +52,37 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
+  const loadFromFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const imported = JSON.parse(evt.target.result);
+        setCards(imported);
+        setCurrentIndex(0);
+      } catch {
+        alert('Invalid JSON file');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null;
+  };
+
   const goPrev = () => setCurrentIndex((i) => (i > 0 ? i - 1 : i));
   const goNext = () =>
     setCurrentIndex((i) => (i < cards.length - 1 ? i + 1 : i));
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
+    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
+      {/* Settings Button */}
+      <button
+        onClick={() => setShowSettings(true)}
+        className="absolute top-4 right-4 p-2 bg-gray-300 rounded hover:bg-gray-400"
+      >
+        ⚙️
+      </button>
+
       {/* Title */}
       <h1 className="text-3xl font-bold text-center">Flashcard App</h1>
 
@@ -70,12 +97,10 @@ export default function App() {
             >
               &larr;
             </button>
-
             <Flashcard
-              question={cards[currentIndex]?.question}
-              answer={cards[currentIndex]?.answer}
+              question={cards[currentIndex].question}
+              answer={cards[currentIndex].answer}
             />
-
             <button
               onClick={goNext}
               disabled={currentIndex === cards.length - 1}
@@ -100,20 +125,13 @@ export default function App() {
         >
           Add Card
         </button>
-        <button
-          onClick={saveToFile}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          Save to File
-        </button>
       </div>
 
-      {/* Modal */}
+      {/* Add Card Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Add New Flashcard</h2>
-
             {/* Question Input */}
             <div className="relative mb-3">
               <input
@@ -132,7 +150,6 @@ export default function App() {
                 </div>
               )}
             </div>
-
             {/* Answer Input */}
             <div className="relative mb-4">
               <input
@@ -151,7 +168,6 @@ export default function App() {
                 </div>
               )}
             </div>
-
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
@@ -168,6 +184,15 @@ export default function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <SettingsModal
+          onClose={() => setShowSettings(false)}
+          onSave={saveToFile}
+          onLoad={loadFromFile}
+        />
       )}
     </div>
   );
