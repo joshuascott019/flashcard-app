@@ -1,4 +1,3 @@
-// ===== App.jsx =====
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
@@ -85,7 +84,11 @@ export default function App() {
 
   const handleSave = () => {
     const defaultName = 'FlashcardApp - ';
-    const fname = window.prompt('Enter filename', defaultName) || defaultName;
+    const fname = window.prompt('Enter filename', defaultName);
+    if (!fname || fname.trim() === '') {
+      setShowSettings(false);
+      return;
+    }
     saveToFile(fname);
     setShowSettings(false);
   };
@@ -96,7 +99,7 @@ export default function App() {
       localStorage.removeItem(STORAGE_KEY);
       setCurrentIndex(0);
       setFlipKey((prev) => prev + 1);
-      setShowSettings(false); // ✅ This is what closes the modal
+      setShowSettings(false);
     }
   };
 
