@@ -9,6 +9,8 @@ export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
   const [newAnswer, setNewAnswer] = useState('');
+  const [questionFocused, setQuestionFocused] = useState(false);
+  const [answerFocused, setAnswerFocused] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function App() {
     };
     const oldLen = cards.length;
     setCards((prev) => [...prev, newCard]);
-    setCurrentIndex(oldLen); // show newly added card
+    setCurrentIndex(oldLen);
     setNewQuestion('');
     setNewAnswer('');
     setShowModal(false);
@@ -62,7 +64,7 @@ export default function App() {
       {/* Title */}
       <h1 className="text-3xl font-bold text-center">Flashcard App</h1>
 
-      {/* Card Display with Pagination or Placeholder */}
+      {/* Card Display */}
       {cards.length > 0 ? (
         <>
           <div className="flex items-center gap-4">
@@ -95,16 +97,14 @@ export default function App() {
         </div>
       )}
 
+      {/* Actions */}
       <div className="flex gap-4">
-        {/* Add New Card */}
         <button
           onClick={() => setShowModal(true)}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Add Card
         </button>
-
-        {/* Export Button */}
         <button
           onClick={saveToFile}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -118,20 +118,45 @@ export default function App() {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Add New Flashcard</h2>
-            <input
-              type="text"
-              placeholder="Question"
-              value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
-              className="w-full border p-2 mb-3 rounded"
-            />
-            <input
-              type="text"
-              placeholder="Answer"
-              value={newAnswer}
-              onChange={(e) => setNewAnswer(e.target.value)}
-              className="w-full border p-2 mb-4 rounded"
-            />
+
+            {/* Question Input */}
+            <div className="relative mb-3">
+              <input
+                type="text"
+                placeholder="Question"
+                maxLength={30}
+                value={newQuestion}
+                onChange={(e) => setNewQuestion(e.target.value)}
+                onFocus={() => setQuestionFocused(true)}
+                onBlur={() => setQuestionFocused(false)}
+                className="w-full border p-2 rounded"
+              />
+              {questionFocused && (
+                <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
+                  {newQuestion.length}/30
+                </div>
+              )}
+            </div>
+
+            {/* Answer Input */}
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Answer"
+                maxLength={30}
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+                onFocus={() => setAnswerFocused(true)}
+                onBlur={() => setAnswerFocused(false)}
+                className="w-full border p-2 rounded"
+              />
+              {answerFocused && (
+                <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
+                  {newAnswer.length}/30
+                </div>
+              )}
+            </div>
+
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
