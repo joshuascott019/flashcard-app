@@ -113,15 +113,14 @@ export default function App() {
 
   const goPrev = () => {
     setCurrentIndex((i) => {
-      const ni = i > 0 ? i - 1 : cards.length - 1;
+      const ni = cards.length ? (i > 0 ? i - 1 : cards.length - 1) : 0;
       setFlipKey((fk) => fk + 1);
       return ni;
     });
   };
-
   const goNext = () => {
     setCurrentIndex((i) => {
-      const ni = i < cards.length - 1 ? i + 1 : 0;
+      const ni = cards.length ? (i < cards.length - 1 ? i + 1 : 0) : 0;
       setFlipKey((fk) => fk + 1);
       return ni;
     });
@@ -171,7 +170,6 @@ export default function App() {
             <div className="flex items-center gap-4 mt-4">
               <button
                 onClick={goPrev}
-                disabled={currentIndex === 0}
                 className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
               >
                 &larr;
@@ -181,7 +179,6 @@ export default function App() {
               }`}</div>
               <button
                 onClick={goNext}
-                disabled={currentIndex === cards.length - 1}
                 className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
               >
                 &rarr;
