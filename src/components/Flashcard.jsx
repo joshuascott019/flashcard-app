@@ -7,7 +7,7 @@ export default function Flashcard({ question, answer }) {
   return (
     <div
       onClick={() => setFlipped(!flipped)}
-      className="h-96 w-[32rem] cursor-pointer perspective overflow-visible"
+      className="cursor-pointer perspective overflow-visible w-[20rem] h-64 sm:w-80 sm:h-[24rem] md:w-[32rem] md:h-96"
     >
       <div
         className={`relative w-full h-full bg-transparent transform-style-preserve-3d transition-transform duration-500 ${

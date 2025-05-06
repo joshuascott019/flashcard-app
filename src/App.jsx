@@ -128,7 +128,13 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
+    <div
+      className="
+      relative min-h-screen bg-gray-100
+      p-4 sm:p-6 md:p-8       /* padding scales up */
+      flex flex-col items-center gap-6
+    "
+    >
       <button
         onClick={() => setShowSettings(true)}
         className="absolute top-4 right-4 p-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -140,28 +146,37 @@ export default function App() {
 
       {cards.length > 0 ? (
         <>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={goPrev}
-              disabled={currentIndex === 0}
-              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
-            >
-              &larr;
-            </button>
+          <div
+            className="
+            flex flex-col items-center gap-4    /* stack on mobile */
+            
+          "
+          >
             <Flashcard
               key={flipKey}
               question={cards[currentIndex].question}
               answer={cards[currentIndex].answer}
             />
-            <button
-              onClick={goNext}
-              disabled={currentIndex === cards.length - 1}
-              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
-            >
-              &rarr;
-            </button>
+            <div className="flex items-center gap-4 mt-4">
+              <button
+                onClick={goPrev}
+                disabled={currentIndex === 0}
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+              >
+                &larr;
+              </button>
+              <div className="text-lg">{`${currentIndex + 1}/${
+                cards.length
+              }`}</div>
+              <button
+                onClick={goNext}
+                disabled={currentIndex === cards.length - 1}
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+              >
+                &rarr;
+              </button>
+            </div>
           </div>
-          <div className="text-lg">{`${currentIndex + 1}/${cards.length}`}</div>
         </>
       ) : (
         <div className="text-gray-500">
