@@ -1,3 +1,4 @@
+// ===== App.jsx =====
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
@@ -29,7 +30,7 @@ export default function App() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
       if (currentIndex >= cards.length) setCurrentIndex(cards.length - 1);
     }
-  }, [cards, hasLoaded]);
+  }, [cards, hasLoaded, currentIndex]);
 
   const addCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
@@ -48,18 +49,31 @@ export default function App() {
     setFlipKey((prev) => prev + 1); // Reset flip
   };
 
-  const saveToFile = (filename) => {
+  // Use File System Access API for directory choice
+  const saveToFile = async (defaultName) => {
     const data = JSON.stringify(cards, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const nameWithExt = filename.endsWith('.json')
-      ? filename
-      : filename + '.json';
-    a.download = nameWithExt;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: defaultName.endsWith('.json')
+            ? defaultName
+            : `${defaultName}.json`,
+          types: [
+            {
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(data);
+        await writable.close();
+      } catch {
+        // User canceled or save failed; silently ignore
+      }
+    } else {
+      alert('Your browser does not support direct directory selection.');
+    }
   };
 
   const loadFromFile = (e) => {
@@ -84,12 +98,7 @@ export default function App() {
 
   const handleSave = () => {
     const defaultName = 'FlashcardApp - ';
-    const fname = window.prompt('Enter filename', defaultName);
-    if (!fname || fname.trim() === '') {
-      setShowSettings(false);
-      return;
-    }
-    saveToFile(fname);
+    saveToFile(defaultName);
     setShowSettings(false);
   };
 
@@ -184,7 +193,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Question"
-                maxLength={120}
+                maxLength={30}
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
                 onFocus={() => setQuestionFocused(true)}
@@ -193,7 +202,7 @@ export default function App() {
               />
               {questionFocused && (
                 <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
-                  {newQuestion.length}/120
+                  {newQuestion.length}/30
                 </div>
               )}
             </div>
@@ -202,7 +211,7 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Answer"
-                maxLength={120}
+                maxLength={30}
                 value={newAnswer}
                 onChange={(e) => setNewAnswer(e.target.value)}
                 onFocus={() => setAnswerFocused(true)}
@@ -211,7 +220,7 @@ export default function App() {
               />
               {answerFocused && (
                 <div className="absolute top-0 right-0 mt-1 mr-2 text-xs text-gray-500">
-                  {newAnswer.length}/120
+                  {newAnswer.length}/30
                 </div>
               )}
             </div>
