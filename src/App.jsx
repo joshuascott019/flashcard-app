@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
+import ManageModal from './components/ManageModal';
 
 const STORAGE_KEY = 'flashcards';
 
@@ -14,7 +15,8 @@ export default function App() {
   const [questionFocused, setQuestionFocused] = useState(false);
   const [answerFocused, setAnswerFocused] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [flipKey, setFlipKey] = useState(0); // Used to reset flip
+  const [showManage, setShowManage] = useState(false);
+  const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   // Load from localStorage
@@ -39,17 +41,15 @@ export default function App() {
       question: newQuestion,
       answer: newAnswer,
     };
-    const oldLen = cards.length;
-    const updatedCards = [...cards, newCard];
-    setCards(updatedCards);
-    setCurrentIndex(oldLen);
+    const updated = [...cards, newCard];
+    setCards(updated);
+    setCurrentIndex(cards.length);
     setNewQuestion('');
     setNewAnswer('');
     setShowModal(false);
-    setFlipKey((prev) => prev + 1); // Reset flip
+    setFlipKey((fk) => fk + 1);
   };
 
-  // Use File System Access API for directory choice
   const saveToFile = async (defaultName) => {
     const data = JSON.stringify(cards, null, 2);
     if (window.showSaveFilePicker) {
@@ -69,7 +69,7 @@ export default function App() {
         await writable.write(data);
         await writable.close();
       } catch {
-        // User canceled or save failed; silently ignore
+        // ignore
       }
     } else {
       alert('Your browser does not support direct directory selection.');
@@ -87,7 +87,7 @@ export default function App() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
         setCurrentIndex(0);
         setShowSettings(false);
-        setFlipKey((prev) => prev + 1); // Reset flip
+        setFlipKey((fk) => fk + 1);
       } catch {
         alert('Invalid JSON file');
       }
@@ -97,8 +97,7 @@ export default function App() {
   };
 
   const handleSave = () => {
-    const defaultName = 'FlashcardApp - ';
-    saveToFile(defaultName);
+    saveToFile('FlashcardApp - ');
     setShowSettings(false);
   };
 
@@ -107,30 +106,29 @@ export default function App() {
       setCards([]);
       localStorage.removeItem(STORAGE_KEY);
       setCurrentIndex(0);
-      setFlipKey((prev) => prev + 1);
+      setFlipKey((fk) => fk + 1);
       setShowSettings(false);
     }
   };
 
   const goPrev = () => {
     setCurrentIndex((i) => {
-      const newIndex = i > 0 ? i - 1 : i;
-      setFlipKey((prev) => prev + 1);
-      return newIndex;
+      const ni = i > 0 ? i - 1 : i;
+      setFlipKey((fk) => fk + 1);
+      return ni;
     });
   };
 
   const goNext = () => {
     setCurrentIndex((i) => {
-      const newIndex = i < cards.length - 1 ? i + 1 : i;
-      setFlipKey((prev) => prev + 1);
-      return newIndex;
+      const ni = i < cards.length - 1 ? i + 1 : i;
+      setFlipKey((fk) => fk + 1);
+      return ni;
     });
   };
 
   return (
     <div className="relative min-h-screen bg-gray-100 flex flex-col items-center p-6 gap-6">
-      {/* Settings Button */}
       <button
         onClick={() => setShowSettings(true)}
         className="absolute top-4 right-4 p-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -138,10 +136,8 @@ export default function App() {
         ⚙️
       </button>
 
-      {/* Title */}
       <h1 className="text-3xl font-bold text-center">Flashcard App</h1>
 
-      {/* Card Display */}
       {cards.length > 0 ? (
         <>
           <div className="flex items-center gap-4">
@@ -173,7 +169,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Actions */}
       <div className="flex gap-4">
         <button
           onClick={() => setShowModal(true)}
@@ -183,12 +178,17 @@ export default function App() {
         </button>
       </div>
 
-      {/* Add Card Modal */}
+      <button
+        onClick={() => setShowManage(true)}
+        className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+      >
+        Manage Deck
+      </button>
+
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Add New Flashcard</h2>
-            {/* Question Input */}
             <div className="relative mb-3">
               <input
                 type="text"
@@ -206,7 +206,6 @@ export default function App() {
                 </div>
               )}
             </div>
-            {/* Answer Input */}
             <div className="relative mb-4">
               <input
                 type="text"
@@ -242,13 +241,24 @@ export default function App() {
         </div>
       )}
 
-      {/* Settings Modal */}
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
           onSave={handleSave}
           onLoad={loadFromFile}
           onClear={handleClear}
+          onManage={() => {
+            setShowSettings(false);
+            setShowManage(true);
+          }}
+        />
+      )}
+
+      {showManage && (
+        <ManageModal
+          cards={cards}
+          onUpdate={setCards}
+          onClose={() => setShowManage(false)}
         />
       )}
     </div>
