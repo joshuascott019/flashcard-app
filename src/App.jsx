@@ -113,7 +113,7 @@ export default function App() {
 
   const goPrev = () => {
     setCurrentIndex((i) => {
-      const ni = i > 0 ? i - 1 : i;
+      const ni = i > 0 ? i - 1 : cards.length - 1;
       setFlipKey((fk) => fk + 1);
       return ni;
     });
@@ -121,10 +121,21 @@ export default function App() {
 
   const goNext = () => {
     setCurrentIndex((i) => {
-      const ni = i < cards.length - 1 ? i + 1 : i;
+      const ni = i < cards.length - 1 ? i + 1 : 0;
       setFlipKey((fk) => fk + 1);
       return ni;
     });
+  };
+
+  const shuffleCards = () => {
+    const shuffled = [...cards];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setCards(shuffled);
+    setCurrentIndex(0);
+    setFlipKey((fk) => fk + 1);
   };
 
   return (
@@ -190,6 +201,12 @@ export default function App() {
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Add Card
+        </button>
+        <button
+          onClick={shuffleCards}
+          className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+        >
+          Shuffle Cards
         </button>
       </div>
 
