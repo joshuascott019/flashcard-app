@@ -286,7 +286,12 @@ export default function App() {
       {showManage && (
         <ManageModal
           cards={cards}
-          onUpdate={setCards}
+          onUpdate={(updated) => {
+            setCards(updated);
+            if (currentIndex >= updated.length) {
+              setCurrentIndex(updated.length - 1);
+            }
+          }}
           onClose={() => setShowManage(false)}
         />
       )}
