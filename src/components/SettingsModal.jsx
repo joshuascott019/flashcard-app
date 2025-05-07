@@ -35,48 +35,35 @@ export default function SettingsModal({
         </label>
 
         <div className="flex flex-col gap-4">
-          {/* <button
-            onClick={onCreateDeck}
-            className="w-full mt-2 px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-          >
-            + New Deck
-          </button> */}
-          {/* <button
-            onClick={onAddCard}
-            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-          >
-            Add Card
-          </button> */}
-
           <button
             onClick={onShuffle}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
             Shuffle Cards
           </button>
-          <button
-            onClick={onManageDecks}
-            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-          >
-            Manage Decks
-          </button>
 
           <button
             onClick={onManageDeck}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
-            Manage Deck
+            Edit Cards
+          </button>
+          <button
+            onClick={onManageDecks}
+            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
+          >
+            Edit Library
           </button>
 
           <button
             onClick={onSave}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
-            Save to File
+            Export Library
           </button>
 
           <label className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 text-center cursor-pointer">
-            Load File
+            Import Library
             <input
               type="file"
               accept=".json"
@@ -89,7 +76,7 @@ export default function SettingsModal({
             onClick={onClear}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
-            Reset Flashcards
+            Delete Library
           </button>
         </div>
 

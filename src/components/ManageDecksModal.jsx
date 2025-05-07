@@ -50,9 +50,9 @@ export default function ManageDecksModal({
 
         <button
           onClick={onCreateDeck}
-          className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 sticky bottom-0"
+          className="w-full px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 sticky bottom-0"
         >
-          + New Deck
+          Add Deck
         </button>
       </div>
     </div>
