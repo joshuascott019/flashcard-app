@@ -1,7 +1,12 @@
 // ===== components/ManageModal.jsx =====
 import React from 'react';
 
-export default function ManageModal({ cards, onUpdate, onClose }) {
+export default function ManageModal({
+  cards = [],
+  onUpdate,
+  onClose,
+  onAddCard,
+}) {
   const handleQuestionChange = (idx, value) => {
     const updated = [...cards];
     updated[idx].question = value;
@@ -22,14 +27,15 @@ export default function ManageModal({ cards, onUpdate, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-11/12 max-w-4xl h-5/6 overflow-auto shadow-lg">
+      <div className="bg-white p-6 rounded-lg w-11/12 max-w-4xl h-5/6 overflow-auto shadow-lg relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Manage Deck</h2>
           <button onClick={onClose} className="text-gray-600 hover:text-black">
             ✕
           </button>
         </div>
-        <div className="space-y-2">
+
+        <div className="space-y-2 mb-16">
           {cards.map((card, idx) => (
             <div key={card.id} className="flex gap-2 items-center">
               <input
@@ -51,6 +57,13 @@ export default function ManageModal({ cards, onUpdate, onClose }) {
             </div>
           ))}
         </div>
+
+        <button
+          onClick={onAddCard}
+          className="w-full px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 sticky bottom-0"
+        >
+          + Add Card
+        </button>
       </div>
     </div>
   );

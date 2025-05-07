@@ -1,7 +1,12 @@
 // src/components/ManageDecksModal.jsx
 import React from 'react';
 
-export default function ManageDecksModal({ libraries, onUpdate, onClose }) {
+export default function ManageDecksModal({
+  libraries = [],
+  onUpdate,
+  onClose,
+  onCreateDeck,
+}) {
   const handleNameChange = (idx, value) => {
     const updated = libraries.map((lib, i) =>
       i === idx ? { ...lib, name: value } : lib
@@ -17,14 +22,15 @@ export default function ManageDecksModal({ libraries, onUpdate, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl h-5/6 overflow-auto shadow-lg">
+      <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl h-5/6 overflow-auto shadow-lg relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Manage Decks</h2>
           <button onClick={onClose} className="text-gray-600 hover:text-black">
             ✕
           </button>
         </div>
-        <div className="space-y-2">
+
+        <div className="space-y-2 mb-16">
           {libraries.map((lib, idx) => (
             <div key={lib.id} className="flex gap-2 items-center">
               <input
@@ -41,6 +47,13 @@ export default function ManageDecksModal({ libraries, onUpdate, onClose }) {
             </div>
           ))}
         </div>
+
+        <button
+          onClick={onCreateDeck}
+          className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 sticky bottom-0"
+        >
+          + New Deck
+        </button>
       </div>
     </div>
   );

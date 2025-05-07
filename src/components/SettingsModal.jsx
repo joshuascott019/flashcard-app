@@ -6,11 +6,11 @@ export default function SettingsModal({
   onSave,
   onLoad,
   onClear,
-  onAddCard,
+  // onAddCard,
   onShuffle,
   onManageDeck, // for editing cards in a deck
   onManageDecks, // for editing ALL DECKS
-  onCreateDeck,
+  // onCreateDeck,
   libraries,
   currentLibraryIndex,
   onLibraryChange,
@@ -35,18 +35,18 @@ export default function SettingsModal({
         </label>
 
         <div className="flex flex-col gap-4">
-          <button
+          {/* <button
             onClick={onCreateDeck}
             className="w-full mt-2 px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
             + New Deck
-          </button>
-          <button
+          </button> */}
+          {/* <button
             onClick={onAddCard}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
             Add Card
-          </button>
+          </button> */}
 
           <button
             onClick={onShuffle}

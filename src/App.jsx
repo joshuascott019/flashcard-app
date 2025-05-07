@@ -23,8 +23,6 @@ export default function App() {
   const [currentLibraryIndex, setCurrentLibraryIndex] = useState(0);
   const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
-  const cards = activeLibrary.cards;
 
   // Load from localStorage
   useEffect(() => {
@@ -171,6 +169,9 @@ export default function App() {
     });
   };
 
+  const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
+  const cards = activeLibrary.cards;
+
   return (
     <div
       className="
@@ -314,26 +315,37 @@ export default function App() {
       {showManage && (
         <ManageModal
           cards={cards}
-          onUpdate={(updated) => {
-            setLibraries(updated);
-            if (currentIndex >= updated.length) {
-              setCurrentIndex(updated.length - 1);
+          onUpdate={(updatedCards) => {
+            setLibraries((prev) =>
+              prev.map((lib, i) =>
+                i === currentLibraryIndex
+                  ? { ...lib, cards: updatedCards }
+                  : lib
+              )
+            );
+            if (currentIndex >= updatedCards.length) {
+              setCurrentIndex(updatedCards.length - 1);
             }
           }}
           onClose={() => setShowManage(false)}
+          onAddCard={() => {
+            setShowManage(false);
+            setShowModal(true);
+          }}
         />
       )}
 
       {showManageDecks && (
         <ManageDecksModal
           libraries={libraries}
-          onUpdate={(updated) => {
-            setLibraries(updated);
-            if (currentLibraryIndex >= updated.length) {
-              setCurrentLibraryIndex(updated.length - 1);
+          onUpdate={(updatedLibs) => {
+            setLibraries(updatedLibs);
+            if (currentLibraryIndex >= updatedLibs.length) {
+              setCurrentLibraryIndex(updatedLibs.length - 1);
             }
           }}
           onClose={() => setShowManageDecks(false)}
+          onCreateDeck={createNewDeck}
         />
       )}
     </div>
