@@ -192,28 +192,6 @@ export default function App() {
         </div>
       )}
 
-      <div className="flex gap-4">
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
-          Add Card
-        </button>
-        <button
-          onClick={shuffleCards}
-          className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
-          Shuffle Cards
-        </button>
-      </div>
-
-      <button
-        onClick={() => setShowManage(true)}
-        className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-      >
-        Manage Deck
-      </button>
-
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
@@ -276,7 +254,16 @@ export default function App() {
           onSave={handleSave}
           onLoad={loadFromFile}
           onClear={handleClear}
-          onManage={() => {
+          // moved actions into SettingsModal:
+          onAddCard={() => {
+            setShowSettings(false);
+            setShowModal(true);
+          }}
+          onShuffle={() => {
+            setShowSettings(false);
+            shuffleCards();
+          }}
+          onManageDeck={() => {
             setShowSettings(false);
             setShowManage(true);
           }}

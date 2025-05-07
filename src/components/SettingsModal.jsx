@@ -1,13 +1,42 @@
 // ===== SettingsModal.jsx =====
 import React from 'react';
 
-export default function SettingsModal({ onClose, onSave, onLoad, onClear }) {
+export default function SettingsModal({
+  onClose,
+  onSave,
+  onLoad,
+  onClear,
+  onAddCard,
+  onShuffle,
+  onManageDeck,
+}) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-80 shadow-lg relative">
         <h2 className="text-xl font-semibold mb-4 text-center">Settings</h2>
 
         <div className="flex flex-col gap-4">
+          <button
+            onClick={onAddCard}
+            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
+          >
+            Add Card
+          </button>
+
+          <button
+            onClick={onShuffle}
+            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
+          >
+            Shuffle Cards
+          </button>
+
+          <button
+            onClick={onManageDeck}
+            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
+          >
+            Manage Deck
+          </button>
+
           <button
             onClick={onSave}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
