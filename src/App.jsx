@@ -16,6 +16,10 @@ export default function App() {
   const [answerFocused, setAnswerFocused] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showManage, setShowManage] = useState(false);
+  const [libraries, setLibraries] = useState([
+    { id: 'default', name: 'Default Deck', cards: [] },
+  ]);
+  const [currentLibraryIndex, setCurrentLibraryIndex] = useState(0);
   const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -137,6 +141,14 @@ export default function App() {
     setFlipKey((fk) => fk + 1);
   };
 
+  const createNewDeck = () => {
+    const name = window.prompt('Enter name of new deck:');
+    if (!name?.trim()) return;
+    const newLib = { id: Date.now().toString(), name: name.trim(), cards: [] };
+    setLibraries((libs) => [...libs, newLib]);
+    setCurrentLibraryIndex(libraries.length);
+  };
+
   return (
     <div
       className="
@@ -254,7 +266,6 @@ export default function App() {
           onSave={handleSave}
           onLoad={loadFromFile}
           onClear={handleClear}
-          // moved actions into SettingsModal:
           onAddCard={() => {
             setShowSettings(false);
             setShowModal(true);
@@ -267,6 +278,13 @@ export default function App() {
             setShowSettings(false);
             setShowManage(true);
           }}
+          libraries={libraries}
+          currentLibraryIndex={currentLibraryIndex}
+          onLibraryChange={(newIndex) => {
+            setCurrentLibraryIndex(newIndex);
+            setCurrentIndex(0);
+          }}
+          onCreateDeck={createNewDeck}
         />
       )}
 
