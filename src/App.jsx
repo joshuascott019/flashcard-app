@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
 import ManageModal from './components/ManageModal';
+import ManageDecksModal from './components/ManageDecksModal';
 
 const STORAGE_KEY = 'flashcards';
 
@@ -15,6 +16,7 @@ export default function App() {
   const [answerFocused, setAnswerFocused] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showManage, setShowManage] = useState(false);
+  const [showManageDecks, setShowManageDecks] = useState(false);
   const [libraries, setLibraries] = useState([
     { id: 'default', name: 'Default Deck', cards: [] },
   ]);
@@ -298,6 +300,7 @@ export default function App() {
             setShowSettings(false);
             setShowManage(true);
           }}
+          onManageDecks={() => setShowManageDecks(true)}
           libraries={libraries}
           currentLibraryIndex={currentLibraryIndex}
           onLibraryChange={(newIndex) => {
@@ -318,6 +321,19 @@ export default function App() {
             }
           }}
           onClose={() => setShowManage(false)}
+        />
+      )}
+
+      {showManageDecks && (
+        <ManageDecksModal
+          libraries={libraries}
+          onUpdate={(updated) => {
+            setLibraries(updated);
+            if (currentLibraryIndex >= updated.length) {
+              setCurrentLibraryIndex(updated.length - 1);
+            }
+          }}
+          onClose={() => setShowManageDecks(false)}
         />
       )}
     </div>
