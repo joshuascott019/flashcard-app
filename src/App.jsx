@@ -7,7 +7,6 @@ import ManageModal from './components/ManageModal';
 const STORAGE_KEY = 'flashcards';
 
 export default function App() {
-  const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
@@ -22,21 +21,29 @@ export default function App() {
   const [currentLibraryIndex, setCurrentLibraryIndex] = useState(0);
   const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
+  const cards = activeLibrary.cards;
 
   // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) setCards(JSON.parse(stored));
+    if (stored) {
+      setLibraries(JSON.parse(stored));
+    }
     setHasLoaded(true);
   }, []);
 
   // Save to localStorage on change
   useEffect(() => {
     if (hasLoaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-      if (currentIndex >= cards.length) setCurrentIndex(cards.length - 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(libraries));
+
+      const len = libraries[currentLibraryIndex]?.cards.length || 0;
+      if (currentIndex >= len) {
+        setCurrentIndex(len - 1);
+      }
     }
-  }, [cards, hasLoaded, currentIndex]);
+  }, [libraries, hasLoaded, currentIndex, currentLibraryIndex]);
 
   const addCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
@@ -45,9 +52,14 @@ export default function App() {
       question: newQuestion,
       answer: newAnswer,
     };
-    const updated = [...cards, newCard];
-    setCards(updated);
-    setCurrentIndex(cards.length);
+    setLibraries((prev) =>
+      prev.map((lib, idx) =>
+        idx === currentLibraryIndex
+          ? { ...lib, cards: [...lib.cards, newCard] }
+          : lib
+      )
+    );
+    setCurrentIndex(libraries[currentLibraryIndex].cards.length);
     setNewQuestion('');
     setNewAnswer('');
     setShowModal(false);
@@ -55,7 +67,7 @@ export default function App() {
   };
 
   const saveToFile = async (defaultName) => {
-    const data = JSON.stringify(cards, null, 2);
+    const data = JSON.stringify(libraries, null, 2);
     if (window.showSaveFilePicker) {
       try {
         const handle = await window.showSaveFilePicker({
@@ -87,8 +99,9 @@ export default function App() {
     reader.onload = (evt) => {
       try {
         const imported = JSON.parse(evt.target.result);
-        setCards(imported);
+        setLibraries(imported);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+        setCurrentLibraryIndex(0);
         setCurrentIndex(0);
         setShowSettings(false);
         setFlipKey((fk) => fk + 1);
@@ -107,7 +120,7 @@ export default function App() {
 
   const handleClear = () => {
     if (window.confirm('Are you sure you want to clear all flashcards?')) {
-      setCards([]);
+      setLibraries([]);
       localStorage.removeItem(STORAGE_KEY);
       setCurrentIndex(0);
       setFlipKey((fk) => fk + 1);
@@ -136,17 +149,24 @@ export default function App() {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    setCards(shuffled);
+    setLibraries(shuffled);
     setCurrentIndex(0);
     setFlipKey((fk) => fk + 1);
   };
 
   const createNewDeck = () => {
-    const name = window.prompt('Enter name of new deck:');
+    const name = window.prompt('Enter name for new deck:');
     if (!name?.trim()) return;
-    const newLib = { id: Date.now().toString(), name: name.trim(), cards: [] };
-    setLibraries((libs) => [...libs, newLib]);
-    setCurrentLibraryIndex(libraries.length);
+    setLibraries((prev) => {
+      const newLib = {
+        id: Date.now().toString(),
+        name: name.trim(),
+        cards: [],
+      };
+      const newList = [...prev, newLib];
+      setCurrentLibraryIndex(newList.length - 1);
+      return newList;
+    });
   };
 
   return (
@@ -292,7 +312,7 @@ export default function App() {
         <ManageModal
           cards={cards}
           onUpdate={(updated) => {
-            setCards(updated);
+            setLibraries(updated);
             if (currentIndex >= updated.length) {
               setCurrentIndex(updated.length - 1);
             }
