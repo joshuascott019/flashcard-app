@@ -7,7 +7,7 @@ export default function SettingsModal({
   onLoad,
   onClear,
   // onAddCard,
-  onShuffle,
+  // onShuffle, // NEEDS FIXING
   onManageDeck, // for editing cards in a deck
   onManageDecks, // for editing ALL DECKS
   // onCreateDeck,
@@ -35,12 +35,12 @@ export default function SettingsModal({
         </label>
 
         <div className="flex flex-col gap-4">
-          <button
+          {/* <button
             onClick={onShuffle}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
             Shuffle Cards
-          </button>
+          </button> */}
 
           <button
             onClick={onManageDeck}
