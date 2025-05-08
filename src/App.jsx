@@ -24,7 +24,6 @@ export default function App() {
   const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -33,7 +32,6 @@ export default function App() {
     setHasLoaded(true);
   }, []);
 
-  // Save to localStorage on change
   useEffect(() => {
     if (hasLoaded) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(libraries));

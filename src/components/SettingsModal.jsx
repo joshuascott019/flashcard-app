@@ -6,11 +6,8 @@ export default function SettingsModal({
   onSave,
   onLoad,
   onClear,
-  // onAddCard,
-  // onShuffle, // NEEDS FIXING
-  onManageDeck, // for editing cards in a deck
-  onManageDecks, // for editing ALL DECKS
-  // onCreateDeck,
+  onManageDeck,
+  onManageDecks,
   libraries,
   currentLibraryIndex,
   onLibraryChange,
@@ -35,13 +32,6 @@ export default function SettingsModal({
         </label>
 
         <div className="flex flex-col gap-4">
-          {/* <button
-            onClick={onShuffle}
-            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-          >
-            Shuffle Cards
-          </button> */}
-
           <button
             onClick={onManageDeck}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
@@ -76,7 +66,7 @@ export default function SettingsModal({
             onClick={onClear}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
-            Delete Library
+            Delete All Decks
           </button>
         </div>
 
