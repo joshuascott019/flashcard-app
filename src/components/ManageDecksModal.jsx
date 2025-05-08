@@ -20,7 +20,8 @@ export default function ManageDecksModal({
   };
 
   const handleAddDeck = () => {
-    const newDeck = { id: Date.now().toString(), name: '', cards: [] };
+    const defaultName = `Deck ${libraries.length + 1}`;
+    const newDeck = { id: Date.now().toString(), name: defaultName, cards: [] };
     onUpdate([...libraries, newDeck]);
   };
 

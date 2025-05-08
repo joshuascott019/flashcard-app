@@ -199,8 +199,8 @@ export default function App() {
           >
             <Flashcard
               key={flipKey}
-              question={cards[currentIndex].question}
-              answer={cards[currentIndex].answer}
+              question={cards[currentIndex]?.question || ''}
+              answer={cards[currentIndex]?.answer || ''}
             />
             <div className="flex items-center gap-4 mt-4">
               <button

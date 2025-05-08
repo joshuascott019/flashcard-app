@@ -21,7 +21,10 @@ export default function ManageModal({ cards = [], onUpdate, onClose }) {
   };
 
   const handleAddCard = () => {
-    const updated = [...cards, { id: Date.now(), question: '', answer: '' }];
+    const updated = [
+      ...cards,
+      { id: Date.now(), question: 'Front:[NO Text]', answer: 'Back:[NO Text]' },
+    ];
     onUpdate(updated);
   };
 
