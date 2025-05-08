@@ -3,8 +3,8 @@ import React from 'react';
 
 export default function SettingsModal({
   onClose,
-  onSave,
-  onLoad,
+  // onSave,
+  // onLoad,
   onClear,
   onManageDeck,
   onManageDecks,
@@ -45,7 +45,7 @@ export default function SettingsModal({
             Edit Library
           </button>
 
-          <button
+          {/* <button
             onClick={onSave}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
           >
@@ -60,7 +60,7 @@ export default function SettingsModal({
               onChange={onLoad}
               className="hidden"
             />
-          </label>
+          </label> */}
 
           <button
             onClick={onClear}
