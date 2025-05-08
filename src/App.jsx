@@ -234,9 +234,7 @@ export default function App() {
           </div>
         </>
       ) : (
-        <div className="text-slate-500">
-          No flashcards yet. Click "Add Card" to create one.
-        </div>
+        <div className="text-slate-500">No flashcards yet.</div>
       )}
 
       {showModal && (
