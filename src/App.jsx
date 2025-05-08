@@ -155,16 +155,15 @@ export default function App() {
   };
 
   const createNewDeck = () => {
-    const name = window.prompt('Enter name for new deck:');
-    if (!name?.trim()) return;
     setLibraries((prev) => {
       const newLib = {
         id: Date.now().toString(),
-        name: name.trim(),
+        name: `Deck ${prev.length + 1}`,
         cards: [],
       };
       const newList = [...prev, newLib];
       setCurrentLibraryIndex(newList.length - 1);
+      setCurrentIndex(0);
       return newList;
     });
   };
@@ -327,10 +326,10 @@ export default function App() {
               setCurrentIndex(updatedCards.length - 1);
             }
           }}
-          onClose={() => setShowManage(false)}
-          onAddCard={() => {
+          onClose={() => {
             setShowManage(false);
-            setShowModal(true);
+            setCurrentIndex(0);
+            setFlipKey((fk) => fk + 1);
           }}
         />
       )}
