@@ -117,13 +117,28 @@ export default function App() {
   };
 
   const handleClear = () => {
-    if (window.confirm('Are you sure you want to clear all flashcards?')) {
-      setLibraries([]);
+    if (window.confirm('Are you sure you want to reset all decks and cards?')) {
+      const defaultLib = {
+        id: Date.now().toString(),
+        name: 'Deck 1',
+        cards: [],
+      };
+      setLibraries([defaultLib]);
       localStorage.removeItem(STORAGE_KEY);
+      setCurrentLibraryIndex(0);
       setCurrentIndex(0);
       setFlipKey((fk) => fk + 1);
       setShowSettings(false);
     }
+  };
+
+  const handleDecksUpdate = (updatedLibs) => {
+    let newLibs = updatedLibs;
+    if (newLibs.length === 0) {
+      newLibs = [{ id: Date.now().toString(), name: 'Deck 1', cards: [] }];
+    }
+    setLibraries(newLibs);
+    setCurrentLibraryIndex(0);
   };
 
   const goPrev = () => {
@@ -335,14 +350,8 @@ export default function App() {
       {showManageDecks && (
         <ManageDecksModal
           libraries={libraries}
-          onUpdate={(updatedLibs) => {
-            setLibraries(updatedLibs);
-            if (currentLibraryIndex >= updatedLibs.length) {
-              setCurrentLibraryIndex(updatedLibs.length - 1);
-            }
-          }}
+          onUpdate={handleDecksUpdate}
           onClose={() => setShowManageDecks(false)}
-          onCreateDeck={createNewDeck}
         />
       )}
     </div>
