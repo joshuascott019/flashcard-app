@@ -1,12 +1,7 @@
 // ===== components/ManageModal.jsx =====
 import React from 'react';
 
-export default function ManageModal({
-  cards = [],
-  onUpdate,
-  onClose,
-  onAddCard,
-}) {
+export default function ManageModal({ cards = [], onUpdate, onClose }) {
   const handleQuestionChange = (idx, value) => {
     const updated = [...cards];
     updated[idx].question = value;
@@ -22,6 +17,11 @@ export default function ManageModal({
   const handleDelete = (idx) => {
     if (!window.confirm('Delete this card?')) return;
     const updated = cards.filter((_, i) => i !== idx);
+    onUpdate(updated);
+  };
+
+  const handleAddCard = () => {
+    const updated = [...cards, { id: Date.now(), question: '', answer: '' }];
     onUpdate(updated);
   };
 
@@ -59,10 +59,10 @@ export default function ManageModal({
         </div>
 
         <button
-          onClick={onAddCard}
+          onClick={handleAddCard}
           className="w-full px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 sticky bottom-0"
         >
-          + Add Card
+          Add Card
         </button>
       </div>
     </div>

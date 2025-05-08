@@ -5,7 +5,6 @@ export default function ManageDecksModal({
   libraries = [],
   onUpdate,
   onClose,
-  onCreateDeck,
 }) {
   const handleNameChange = (idx, value) => {
     const updated = libraries.map((lib, i) =>
@@ -18,6 +17,11 @@ export default function ManageDecksModal({
     if (!window.confirm('Delete this deck?')) return;
     const updated = libraries.filter((_, i) => i !== idx);
     onUpdate(updated);
+  };
+
+  const handleAddDeck = () => {
+    const newDeck = { id: Date.now().toString(), name: '', cards: [] };
+    onUpdate([...libraries, newDeck]);
   };
 
   return (
@@ -49,7 +53,7 @@ export default function ManageDecksModal({
         </div>
 
         <button
-          onClick={onCreateDeck}
+          onClick={handleAddDeck}
           className="w-full px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 sticky bottom-0"
         >
           Add Deck
