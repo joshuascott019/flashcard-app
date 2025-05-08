@@ -198,9 +198,7 @@ export default function App() {
       >
         ⚙️
       </button>
-
       <h1 className="text-3xl font-bold text-center">Flashcard App</h1>
-
       {cards.length > 0 ? (
         <>
           <div
@@ -236,7 +234,6 @@ export default function App() {
       ) : (
         <div className="text-slate-500">No flashcards yet.</div>
       )}
-
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
@@ -292,7 +289,6 @@ export default function App() {
           </div>
         </div>
       )}
-
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
@@ -339,8 +335,12 @@ export default function App() {
           }}
           onClose={() => {
             setShowManage(false);
-            setCurrentIndex(0);
+            setShowSettings(true);
             setFlipKey((fk) => fk + 1);
+          }}
+          onAddCard={() => {
+            setShowManage(false);
+            setShowModal(true);
           }}
         />
       )}
