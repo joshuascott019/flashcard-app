@@ -49,8 +49,38 @@ export default function ManageDecksModal({
     reader.onload = (evt) => {
       try {
         const imported = JSON.parse(evt.target.result);
-        // assume imported is a single deck object
-        const newDeck = { ...imported, id: Date.now().toString() };
+        const baseName = imported.name?.trim() || 'Imported Deck';
+
+        // build regex to match baseName and baseName (n)
+        const esc = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`^${esc}(?: \\((\\d+)\\))?$`);
+
+        // find all matching names and extract their indices
+        let maxIdx = 0;
+        libraries.forEach((lib) => {
+          const m = lib.name.match(re);
+          if (m) {
+            const idx = m[1] ? parseInt(m[1], 10) : 1;
+            if (idx > maxIdx) maxIdx = idx;
+          }
+        });
+
+        let finalName = baseName;
+        if (maxIdx > 0) {
+          const defaultName = `${baseName} (${maxIdx + 1})`;
+          const input = window.prompt(
+            `${baseName} already exists in your library. Please change the name and click OK:`,
+            defaultName
+          );
+          if (input === null) return; // cancel import
+          finalName = input.trim() || defaultName;
+        }
+
+        const newDeck = {
+          id: Date.now().toString(),
+          name: finalName,
+          cards: Array.isArray(imported.cards) ? imported.cards : [],
+        };
         onUpdate([...libraries, newDeck]);
       } catch {
         alert('Invalid deck file');
