@@ -69,58 +69,6 @@ export default function App() {
     setFlipKey((fk) => fk + 1);
   };
 
-  // const saveToFile = async (defaultName) => {
-  //   const data = JSON.stringify(libraries, null, 2);
-  //   if (window.showSaveFilePicker) {
-  //     try {
-  //       const handle = await window.showSaveFilePicker({
-  //         suggestedName: defaultName.endsWith('.json')
-  //           ? defaultName
-  //           : `${defaultName}.json`,
-  //         types: [
-  //           {
-  //             description: 'JSON Files',
-  //             accept: { 'application/json': ['.json'] },
-  //           },
-  //         ],
-  //       });
-  //       const writable = await handle.createWritable();
-  //       await writable.write(data);
-  //       await writable.close();
-  //     } catch {
-  //       // ignore
-  //     }
-  //   } else {
-  //     alert('Your browser does not support direct directory selection.');
-  //   }
-  // };
-
-  // const loadFromFile = (e) => {
-  //   const file = e.target.files[0];
-  //   if (!file) return;
-  //   const reader = new FileReader();
-  //   reader.onload = (evt) => {
-  //     try {
-  //       const imported = JSON.parse(evt.target.result);
-  //       setLibraries(imported);
-  //       localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
-  //       setCurrentLibraryIndex(0);
-  //       setCurrentIndex(0);
-  //       setShowSettings(false);
-  //       setFlipKey((fk) => fk + 1);
-  //     } catch {
-  //       alert('Invalid JSON file');
-  //     }
-  //   };
-  //   reader.readAsText(file);
-  //   e.target.value = null;
-  // };
-
-  // const handleSave = () => {
-  //   saveToFile('FlashcardApp - ');
-  //   setShowSettings(false);
-  // };
-
   const handleClear = () => {
     if (window.confirm('Are you sure you want to reset all decks and cards?')) {
       const defaultLib = {
@@ -136,15 +84,6 @@ export default function App() {
       setShowSettings(false);
     }
   };
-
-  // const handleDecksUpdate = (updatedLibs) => {
-  //   let newLibs = updatedLibs;
-  //   if (newLibs.length === 0) {
-  //     newLibs = [{ id: Date.now().toString(), name: 'Deck 1', cards: [] }];
-  //   }
-  //   setLibraries(newLibs);
-  //   setCurrentLibraryIndex(0);
-  // };
 
   const goPrev = () => {
     setCurrentIndex((i) => {
@@ -198,7 +137,6 @@ export default function App() {
     setFlipKey((fk) => fk + 1);
   };
 
-  // const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
   const cards = loadedDeck;
 
   return (
@@ -315,8 +253,6 @@ export default function App() {
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
-          // onSave={handleSave}
-          // onLoad={loadFromFile}
           onClear={handleClear}
           onAddCard={() => {
             setShowSettings(false);

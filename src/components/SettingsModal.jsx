@@ -3,8 +3,6 @@ import React from 'react';
 
 export default function SettingsModal({
   onClose,
-  // onSave,
-  // onLoad,
   onClear,
   onManageDeck,
   onManageDecks,
@@ -44,23 +42,6 @@ export default function SettingsModal({
           >
             Edit Decks
           </button>
-
-          {/* <button
-            onClick={onSave}
-            className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-          >
-            Export Library
-          </button>
-
-          <label className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 text-center cursor-pointer">
-            Import Library
-            <input
-              type="file"
-              accept=".json"
-              onChange={onLoad}
-              className="hidden"
-            />
-          </label> */}
 
           <button
             onClick={onClear}
