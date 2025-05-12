@@ -132,14 +132,14 @@ export default function App() {
     }
   };
 
-  const handleDecksUpdate = (updatedLibs) => {
-    let newLibs = updatedLibs;
-    if (newLibs.length === 0) {
-      newLibs = [{ id: Date.now().toString(), name: 'Deck 1', cards: [] }];
-    }
-    setLibraries(newLibs);
-    setCurrentLibraryIndex(0);
-  };
+  // const handleDecksUpdate = (updatedLibs) => {
+  //   let newLibs = updatedLibs;
+  //   if (newLibs.length === 0) {
+  //     newLibs = [{ id: Date.now().toString(), name: 'Deck 1', cards: [] }];
+  //   }
+  //   setLibraries(newLibs);
+  //   setCurrentLibraryIndex(0);
+  // };
 
   const goPrev = () => {
     setCurrentIndex((i) => {
@@ -348,7 +348,16 @@ export default function App() {
       {showManageDecks && (
         <ManageDecksModal
           libraries={libraries}
-          onUpdate={handleDecksUpdate}
+          onUpdate={(updatedLibs) => {
+            setLibraries(updatedLibs);
+            const newIndex =
+              currentLibraryIndex >= updatedLibs.length
+                ? updatedLibs.length - 1
+                : currentLibraryIndex;
+            setCurrentLibraryIndex(newIndex);
+            setCurrentIndex(0);
+            setFlipKey((fk) => fk + 1);
+          }}
           onClose={() => setShowManageDecks(false)}
         />
       )}
