@@ -20,9 +20,44 @@ export default function ManageDecksModal({
   };
 
   const handleAddDeck = () => {
-    const defaultName = `Deck ${libraries.length + 1}`;
-    const newDeck = { id: Date.now().toString(), name: defaultName, cards: [] };
+    const newDeck = {
+      id: Date.now().toString(),
+      name: `Deck ${libraries.length + 1}`,
+      cards: [],
+    };
     onUpdate([...libraries, newDeck]);
+  };
+
+  const handleDownloadDeck = (idx) => {
+    const deck = libraries[idx];
+    const data = JSON.stringify(deck, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deck.name}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportDeck = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const imported = JSON.parse(evt.target.result);
+        // assume imported is a single deck object
+        const newDeck = { ...imported, id: Date.now().toString() };
+        onUpdate([...libraries, newDeck]);
+      } catch {
+        alert('Invalid deck file');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null;
   };
 
   return (
@@ -44,6 +79,12 @@ export default function ManageDecksModal({
                 onChange={(e) => handleNameChange(idx, e.target.value)}
               />
               <button
+                onClick={() => handleDownloadDeck(idx)}
+                className="px-2 text-blue-600 hover:text-blue-800"
+              >
+                📥
+              </button>
+              <button
                 onClick={() => handleDelete(idx)}
                 className="px-2 text-red-600 hover:text-red-800"
               >
@@ -59,6 +100,16 @@ export default function ManageDecksModal({
         >
           Add Deck
         </button>
+
+        <label className="w-full mt-2 block text-center px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600 cursor-pointer sticky bottom-0">
+          Import Deck
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleImportDeck}
+            className="hidden"
+          />
+        </label>
       </div>
     </div>
   );
