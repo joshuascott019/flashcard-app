@@ -23,6 +23,7 @@ export default function App() {
   const [currentLibraryIndex, setCurrentLibraryIndex] = useState(0);
   const [flipKey, setFlipKey] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [loadedDeck, setLoadedDeck] = useState([]);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -42,6 +43,10 @@ export default function App() {
       }
     }
   }, [libraries, hasLoaded, currentIndex, currentLibraryIndex]);
+
+  useEffect(() => {
+    setLoadedDeck(libraries[currentLibraryIndex]?.cards || []);
+  }, [libraries, currentLibraryIndex]);
 
   const addCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
@@ -181,8 +186,20 @@ export default function App() {
     });
   };
 
-  const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
-  const cards = activeLibrary.cards;
+  const shuffleLoadedDeck = () => {
+    setLoadedDeck((prev) => {
+      const arr = [...prev];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    });
+    setFlipKey((fk) => fk + 1);
+  };
+
+  // const activeLibrary = libraries[currentLibraryIndex] || { cards: [] };
+  const cards = loadedDeck;
 
   return (
     <div
@@ -192,6 +209,12 @@ export default function App() {
       flex flex-col items-center gap-6
     "
     >
+      <button
+        onClick={shuffleLoadedDeck}
+        className="absolute top-4 right-16 p-2 bg-slate-300 rounded hover:bg-slate-400"
+      >
+        🔀
+      </button>
       <button
         onClick={() => setShowSettings(true)}
         className="absolute top-4 right-4 p-2 bg-slate-300 rounded hover:bg-slate-400"
