@@ -18,7 +18,7 @@ export default function App() {
   const [showManage, setShowManage] = useState(false);
   const [showManageDecks, setShowManageDecks] = useState(false);
   const [libraries, setLibraries] = useState([
-    { id: 'default', name: 'Default Deck', cards: [] },
+    { id: Date.now(), name: 'Deck 1', cards: [] },
   ]);
   const [currentLibraryIndex, setCurrentLibraryIndex] = useState(0);
   const [flipKey, setFlipKey] = useState(0);
