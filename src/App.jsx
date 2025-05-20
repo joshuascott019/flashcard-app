@@ -9,6 +9,21 @@ import ErrorModal from './components/ErrorModal';
 const STORAGE_KEY = 'flashcards';
 
 export default function App() {
+  // A “deck candidate” must be an object with string id, string name, and an array of cards
+  const isDeckCandidate = (d) =>
+    d &&
+    typeof d === 'object' &&
+    (typeof d.id === 'string' || typeof d.id === 'number') &&
+    typeof d.name === 'string' &&
+    Array.isArray(d.cards);
+
+  // A “card candidate” must be an object with id, question, and answer
+  const isCardCandidate = (c) =>
+    c &&
+    typeof c === 'object' &&
+    (typeof c.id === 'string' || typeof c.id === 'number') &&
+    typeof c.question === 'string' &&
+    typeof c.answer === 'string';
   const [hasLoadError, setHasLoadError] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [migrationState, setMigrationState] = useState('idle'); // 'idle'|'running'|'failed'
@@ -34,19 +49,26 @@ export default function App() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (!Array.isArray(parsed)) {
-          throw new Error('Saved data is not an array');
+
+        // Must be an array of valid decks, each deck’s cards must be valid cards
+        if (!Array.isArray(parsed) || !parsed.every(isDeckCandidate)) {
+          throw new Error('Data isn’t an array of decks');
         }
-        // (Optional) further shape checks: each entry has id, name, cards[]
+
+        // Also enforce that every deck’s cards array contains only valid cards
+        parsed.forEach((deck) => {
+          if (!deck.cards.every(isCardCandidate)) {
+            throw new Error(`Deck "${deck.name}" has bad cards`);
+          }
+        });
+
         setLibraries(parsed);
       }
     } catch (e) {
       console.error('Error loading flashcards:', e);
-      // flag the problem—don’t mutate libraries here
       setHasLoadError(true);
       setShowErrorModal(true);
     } finally {
-      // whether success or failure, we’re “done loading”
       setHasLoaded(true);
     }
   }, []);
@@ -125,7 +147,10 @@ export default function App() {
 
   const handleMigrate = () => {
     setMigrationState('running');
-    doMigration();
+    // wait 1s so spinner is visible before running migration
+    setTimeout(() => {
+      doMigration();
+    }, 1000);
   };
 
   const addCard = () => {
