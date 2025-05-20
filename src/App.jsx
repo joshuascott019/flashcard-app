@@ -4,10 +4,13 @@ import Flashcard from './components/Flashcard';
 import SettingsModal from './components/SettingsModal';
 import ManageModal from './components/ManageModal';
 import ManageDecksModal from './components/ManageDecksModal';
+import ErrorModal from './components/ErrorModal';
 
 const STORAGE_KEY = 'flashcards';
 
 export default function App() {
+  const [hasLoadError, setHasLoadError] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
@@ -26,15 +29,30 @@ export default function App() {
   const [loadedDeck, setLoadedDeck] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setLibraries(JSON.parse(stored));
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) {
+          throw new Error('Saved data is not an array');
+        }
+        // (Optional) further shape checks: each entry has id, name, cards[]
+        setLibraries(parsed);
+      }
+    } catch (e) {
+      console.error('Error loading flashcards:', e);
+      // flag the problem—don’t mutate libraries here
+      setHasLoadError(true);
+      setShowErrorModal(true);
+    } finally {
+      // whether success or failure, we’re “done loading”
+      setHasLoaded(true);
     }
-    setHasLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (hasLoaded) {
+    // only write back if initial load succeeded
+    if (hasLoaded && !hasLoadError) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(libraries));
 
       const len = libraries[currentLibraryIndex]?.cards.length || 0;
@@ -42,7 +60,13 @@ export default function App() {
         setCurrentIndex(len - 1);
       }
     }
-  }, [libraries, hasLoaded, currentIndex, currentLibraryIndex]);
+  }, [
+    libraries,
+    hasLoaded,
+    currentIndex,
+    currentLibraryIndex,
+    hasLoadError, // add this to deps
+  ]);
 
   useEffect(() => {
     setLoadedDeck(libraries[currentLibraryIndex]?.cards || []);
@@ -123,6 +147,20 @@ export default function App() {
       setCurrentIndex(0);
       return newList;
     });
+  };
+  const handleReset = () => {
+    // wipe out the bad data and restore a clean default
+    const defaultLib = {
+      id: Date.now().toString(),
+      name: 'Deck 1',
+      cards: [],
+    };
+    setLibraries([defaultLib]);
+    localStorage.removeItem(STORAGE_KEY);
+    setCurrentLibraryIndex(0);
+    setCurrentIndex(0);
+    setHasLoadError(false);
+    setShowErrorModal(false);
   };
 
   const shuffleLoadedDeck = () => {
@@ -318,6 +356,13 @@ export default function App() {
             setFlipKey((fk) => fk + 1);
           }}
           onClose={() => setShowManageDecks(false)}
+        />
+      )}
+      {showErrorModal && (
+        <ErrorModal
+          onReset={handleReset}
+          /* onMigrate={…} */
+          onClose={() => setShowErrorModal(false)}
         />
       )}
     </div>
