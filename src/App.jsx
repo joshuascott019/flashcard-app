@@ -11,6 +11,7 @@ const STORAGE_KEY = 'flashcards';
 export default function App() {
   const [hasLoadError, setHasLoadError] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [migrationState, setMigrationState] = useState('idle'); // 'idle'|'running'|'failed'
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState('');
@@ -71,6 +72,61 @@ export default function App() {
   useEffect(() => {
     setLoadedDeck(libraries[currentLibraryIndex]?.cards || []);
   }, [libraries, currentLibraryIndex]);
+
+  const doMigration = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = JSON.parse(raw);
+
+      // simple top-level array scan
+      const migrated = Array.isArray(parsed)
+        ? parsed
+            .filter(
+              (d) =>
+                d &&
+                typeof d === 'object' &&
+                d.id &&
+                d.name &&
+                Array.isArray(d.cards)
+            )
+            .map((d) => ({
+              id: String(d.id),
+              name: d.name,
+              cards: d.cards
+                .filter(
+                  (c) =>
+                    c && typeof c === 'object' && c.id && c.question && c.answer
+                )
+                .map((c) => ({
+                  id: String(c.id),
+                  question: c.question,
+                  answer: c.answer,
+                })),
+            }))
+        : [];
+
+      // require at least one deck AND one card somewhere
+      const hasContent =
+        migrated.length > 0 && migrated.some((d) => d.cards.length > 0);
+      if (hasContent) {
+        setLibraries(migrated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        setShowErrorModal(false);
+        setHasLoadError(false);
+        setMigrationState('idle');
+      } else {
+        throw new Error('No valid decks/cards found');
+      }
+    } catch (err) {
+      console.error('Migration failed:', err);
+      setMigrationState('failed');
+    }
+  };
+
+  const handleMigrate = () => {
+    setMigrationState('running');
+    doMigration();
+  };
 
   const addCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
@@ -360,8 +416,9 @@ export default function App() {
       )}
       {showErrorModal && (
         <ErrorModal
+          migrationState={migrationState}
+          onMigrate={handleMigrate}
           onReset={handleReset}
-          /* onMigrate={…} */
           onClose={() => setShowErrorModal(false)}
         />
       )}

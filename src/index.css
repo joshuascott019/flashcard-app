@@ -12,3 +12,13 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+.loader {
+  border-top-color: #3498db;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
